@@ -1,0 +1,36 @@
+service: serverless-example
+
+# username: postgres
+# password: 2dIkIbYqoSwU26Ed8TQO
+
+plugins:
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-west-1
+  stage: dev
+  environment:
+      POSTGRES_HOST: card-db-tst.cbms4igeq4hg.eu-west-1.rds.amazonaws.com
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: cart
+      POSTGRES_USER: ${env:USER}
+      POSTGRES_PASSWORD: ${env:PASSWORD}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "rds-db:*"
+      Resource: "*"
+
+functions:
+  main:
+    handler: dist/main.handler
+    events:
+      - http:
+          method: ANY
+          path: /
+      - http:
+          method: ANY
+          path: '{proxy+}'
